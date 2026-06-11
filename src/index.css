@@ -720,6 +720,28 @@ textarea.text-input {
   color: var(--ink);
 }
 
+/* Tiny unobtrusive dev control: wipe IndexedDB + reload the seed list. */
+.reset-data {
+  position: fixed;
+  bottom: 8px;
+  right: 10px;
+  z-index: 50;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  opacity: 0.45;
+}
+
+.reset-data:hover {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* Edit / delete controls at the foot of the dish detail. */
 .detail-admin {
   display: flex;

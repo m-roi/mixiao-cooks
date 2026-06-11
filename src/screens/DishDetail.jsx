@@ -73,7 +73,13 @@ export default function DishDetail({
 
       <h1>{dish.name}</h1>
       <p className="dish-meta">
-        {dish.origin.join(", ")} · {TIME_LABELS[dish.timeCategory]}
+        {[
+          dish.origin.join(", "),
+          (dish.mealType || []).join(", "),
+          TIME_LABELS[dish.timeCategory],
+        ]
+          .filter(Boolean)
+          .join(" · ")}
       </p>
 
       {photoUrls.length > 0 && (

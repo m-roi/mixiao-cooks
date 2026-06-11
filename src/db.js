@@ -7,7 +7,7 @@
 // Single device, no sync, no server — everything lives in this browser.
 
 import { openDB } from "idb";
-import { seedDishes } from "./seed/seedDishes.js";
+import { seedDishes } from "./seed/seed-dishes.js";
 
 const DB_NAME = "mixiao-cooks";
 const DB_VERSION = 1;
@@ -66,4 +66,13 @@ export async function updateDish(dish) {
 export async function deleteDish(id) {
   const db = await getDB();
   await db.delete(STORE, id);
+}
+
+// Dev helper: wipe the store completely and reload the seed list fresh. Used by
+// the "reset data" control so seed-file updates don't require clearing
+// IndexedDB by hand. seedIfEmpty re-seeds because the store is now empty.
+export async function resetData() {
+  const db = await getDB();
+  await db.clear(STORE);
+  await seedIfEmpty();
 }

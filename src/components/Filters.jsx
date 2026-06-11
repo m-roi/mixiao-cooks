@@ -2,6 +2,8 @@
 // - Time category: single-select (one of the three, or "all").
 // - Origin: multi-select. Selecting several tags is OR (a dish shows if it
 //   matches any selected tag). Options are derived from the dishes present.
+// - Meal: single-select (or "all"). A dish matches if any of its mealType
+//   tags equals the selected one.
 
 const TIME_CATEGORIES = [
   { value: "all", label: "All" },
@@ -10,12 +12,21 @@ const TIME_CATEGORIES = [
   { value: "time-consuming", label: "Time-consuming" },
 ];
 
+const MEAL_CATEGORIES = [
+  { value: "all", label: "All" },
+  { value: "Snack", label: "Snack" },
+  { value: "Breakfast", label: "Breakfast" },
+  { value: "Proper meal", label: "Proper meal" },
+];
+
 export default function Filters({
   originOptions,
   timeFilter,
   onTimeFilter,
   selectedOrigins,
   onToggleOrigin,
+  mealFilter,
+  onMealFilter,
 }) {
   return (
     <div className="filters">
@@ -50,6 +61,20 @@ export default function Filters({
           ))}
         </div>
       )}
+
+      <div className="filter-group">
+        <span className="filter-label">Meal:</span>
+        {MEAL_CATEGORIES.map(({ value, label }) => (
+          <button
+            key={value}
+            type="button"
+            className={mealFilter === value ? "chip chip-on" : "chip"}
+            onClick={() => onMealFilter(value)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

@@ -7,11 +7,14 @@ const TIME_LABELS = {
   "time-consuming": "Time-consuming",
 };
 
-// Browse menu: scrollable list of all dishes with time + origin filters.
-// A dish matches the origin filter if ANY of its tags is selected (OR).
+// Browse menu: scrollable list of all dishes with time, origin, and meal
+// filters. A dish matches the origin filter if ANY of its tags is selected
+// (OR); meal matches if any of its mealType tags equals the selected one. All
+// three filters combine — a dish must satisfy every active filter to show.
 export default function Menu({ dishes, onHome, onOpenDish, onAdd }) {
   const [timeFilter, setTimeFilter] = useState("all");
   const [selectedOrigins, setSelectedOrigins] = useState([]);
+  const [mealFilter, setMealFilter] = useState("all");
 
   // Origin options come from the origins actually present in the data.
   const originOptions = useMemo(() => {
@@ -26,9 +29,11 @@ export default function Menu({ dishes, onHome, onOpenDish, onAdd }) {
       const originOk =
         selectedOrigins.length === 0 ||
         d.origin.some((o) => selectedOrigins.includes(o));
-      return timeOk && originOk;
+      const mealOk =
+        mealFilter === "all" || (d.mealType || []).includes(mealFilter);
+      return timeOk && originOk && mealOk;
     });
-  }, [dishes, timeFilter, selectedOrigins]);
+  }, [dishes, timeFilter, selectedOrigins, mealFilter]);
 
   function toggleOrigin(origin) {
     setSelectedOrigins((prev) =>
@@ -56,6 +61,8 @@ export default function Menu({ dishes, onHome, onOpenDish, onAdd }) {
         onTimeFilter={setTimeFilter}
         selectedOrigins={selectedOrigins}
         onToggleOrigin={toggleOrigin}
+        mealFilter={mealFilter}
+        onMealFilter={setMealFilter}
       />
 
       {visible.length === 0 ? (
@@ -71,7 +78,13 @@ export default function Menu({ dishes, onHome, onOpenDish, onAdd }) {
               >
                 <span className="dish-name">{dish.name}</span>
                 <span className="dish-meta">
-                  {dish.origin.join(", ")} · {TIME_LABELS[dish.timeCategory]}
+                  {[
+                    dish.origin.join(", "),
+                    (dish.mealType || []).join(", "),
+                    TIME_LABELS[dish.timeCategory],
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
                 </span>
               </button>
             </li>

@@ -6,6 +6,8 @@ const TIME_CATEGORIES = [
   { value: "time-consuming", label: "Time-consuming" },
 ];
 
+const MEAL_TYPES = ["Snack", "Breakfast", "Proper meal"];
+
 // A repeated text field (ingredients / appliances / steps). `ordered` numbers
 // the rows; `multiline` uses a textarea (for steps).
 function ListField({ items, setItems, placeholder, ordered, multiline }) {
@@ -65,6 +67,7 @@ export default function AddDish({ dishes, dish, onCancel, onSaved }) {
   });
   const [newOrigin, setNewOrigin] = useState("");
   const [timeCategory, setTimeCategory] = useState(dish?.timeCategory ?? "medium");
+  const [mealTypes, setMealTypes] = useState(dish?.mealType ?? []);
   const [ingredients, setIngredients] = useState(
     dish?.ingredients?.length ? dish.ingredients : [""]
   );
@@ -101,6 +104,12 @@ export default function AddDish({ dishes, dish, onCancel, onSaved }) {
     setNewOrigin("");
   }
 
+  function toggleMeal(m) {
+    setMealTypes((prev) =>
+      prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]
+    );
+  }
+
   function onPhotos(e) {
     setPhotos((prev) => [...prev, ...Array.from(e.target.files)]);
     e.target.value = ""; // allow re-picking the same file
@@ -129,6 +138,7 @@ export default function AddDish({ dishes, dish, onCancel, onSaved }) {
       name: name.trim(),
       origin: origins,
       timeCategory,
+      mealType: mealTypes,
       ingredients: ingredients.map((s) => s.trim()).filter(Boolean),
       appliances: appliances.map((s) => s.trim()).filter(Boolean),
       steps: steps.map((s) => s.trim()).filter(Boolean),
@@ -210,6 +220,24 @@ export default function AddDish({ dishes, dish, onCancel, onSaved }) {
               onClick={() => setTimeCategory(value)}
             >
               {label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <hr />
+
+      <section>
+        <h2>Meal:</h2>
+        <div className="chip-row">
+          {MEAL_TYPES.map((m) => (
+            <button
+              key={m}
+              type="button"
+              className={mealTypes.includes(m) ? "chip chip-on" : "chip"}
+              onClick={() => toggleMeal(m)}
+            >
+              {m}
             </button>
           ))}
         </div>

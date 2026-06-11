@@ -5,6 +5,7 @@ import {
   addDish,
   updateDish,
   deleteDish,
+  resetData,
 } from "./db.js";
 import Home from "./screens/Home.jsx";
 import Menu from "./screens/Menu.jsx";
@@ -42,12 +43,30 @@ export default function App() {
     };
   }, []);
 
+  // Dev control: wipe IndexedDB and reload the seed list (e.g. after editing
+  // seed-dishes.js). Confirms first since it also drops any app-added dishes.
+  async function handleReset() {
+    if (
+      !window.confirm(
+        "Reset data?\n\nThis wipes the database and reloads the seed list. Any dishes you added through the app will be lost."
+      )
+    ) {
+      return;
+    }
+    await resetData();
+    setDishes(await getAllDishes());
+    setSelectedId(null);
+    setEditingId(null);
+    setView("menu");
+  }
+
   if (dishes === null) {
     return <p className="loading">Loading…</p>;
   }
 
+  let screen;
   if (view === "menu") {
-    return (
+    screen = (
       <Menu
         dishes={dishes}
         onHome={() => setView("home")}
@@ -55,48 +74,45 @@ export default function App() {
         onAdd={() => setView("add")}
       />
     );
-  }
-
-  if (view === "detail") {
+  } else if (view === "detail") {
     const selected = dishes.find((d) => d.id === selectedId);
-    if (selected) {
-      return (
-        <DishDetail
-          dish={selected}
-          backLabel={returnView === "draw" ? "draw" : "menu"}
-          onBack={() => setView(returnView)}
-          onEdit={() => {
-            setEditingId(selected.id);
-            setView("add");
-          }}
-          onDelete={async (id) => {
-            await deleteDish(id);
-            setDishes(await getAllDishes());
-            setView("menu");
-          }}
-        />
-      );
-    }
-    // Selected dish missing (shouldn't happen) — fall back to the menu.
-    setView("menu");
-    return null;
-  }
-
-  if (view === "draw") {
-    return (
+    screen = selected ? (
+      <DishDetail
+        dish={selected}
+        backLabel={returnView === "draw" ? "draw" : "menu"}
+        onBack={() => setView(returnView)}
+        onEdit={() => {
+          setEditingId(selected.id);
+          setView("add");
+        }}
+        onDelete={async (id) => {
+          await deleteDish(id);
+          setDishes(await getAllDishes());
+          setView("menu");
+        }}
+      />
+    ) : (
+      // Selected dish missing (shouldn't happen) — fall back to the menu.
+      <Menu
+        dishes={dishes}
+        onHome={() => setView("home")}
+        onOpenDish={(id) => openDish(id, "menu")}
+        onAdd={() => setView("add")}
+      />
+    );
+  } else if (view === "draw") {
+    screen = (
       <Draw
         dishes={dishes}
         onBack={() => setView("home")}
         onOpenDish={(id) => openDish(id, "draw")}
       />
     );
-  }
-
-  if (view === "add") {
+  } else if (view === "add") {
     const editingDish = editingId
       ? dishes.find((d) => d.id === editingId)
       : null;
-    return (
+    screen = (
       <AddDish
         dishes={dishes}
         dish={editingDish}
@@ -115,12 +131,18 @@ export default function App() {
         }}
       />
     );
+  } else {
+    screen = (
+      <Home onNoIdea={() => setView("draw")} onInspo={() => setView("menu")} />
+    );
   }
 
   return (
-    <Home
-      onNoIdea={() => setView("draw")}
-      onInspo={() => setView("menu")}
-    />
+    <>
+      {screen}
+      <button type="button" className="reset-data" onClick={handleReset}>
+        reset data
+      </button>
+    </>
   );
 }
