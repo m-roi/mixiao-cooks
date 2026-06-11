@@ -71,26 +71,27 @@ export default function DishDetail({
         ← {backLabel}
       </button>
 
-      <h1>{dish.name}</h1>
-      <p className="dish-meta">
-        {[
-          dish.origin.join(", "),
-          (dish.mealType || []).join(", "),
-          TIME_LABELS[dish.timeCategory],
-        ]
-          .filter(Boolean)
-          .join(" · ")}
-      </p>
-
-      {photoUrls.length > 0 && (
-        <div className="photo-strip">
-          {photoUrls.map((url, i) => (
-            <span key={i} className="photo-frame">
-              <img src={url} alt={`${dish.name} ${i + 1}`} />
-            </span>
-          ))}
+      <div className="detail-head">
+        <div className="detail-head-text">
+          <h1>{dish.name}</h1>
+          <p className="dish-meta">
+            {[
+              dish.origin.join(", "),
+              (dish.mealType || []).join(", "),
+              TIME_LABELS[dish.timeCategory],
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
         </div>
-      )}
+        {photoUrls.length > 0 && (
+          <div className="detail-photos">
+            {photoUrls.map((url, i) => (
+              <img key={i} src={url} alt={`${dish.name} ${i + 1}`} />
+            ))}
+          </div>
+        )}
+      </div>
 
       <hr />
 

@@ -86,9 +86,19 @@ export default function AddDish({ dishes, dish, onCancel, onSaved }) {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
-  // Previews for chosen photos; revoke object URLs when the set changes.
-  const previews = useMemo(() => photos.map((f) => URL.createObjectURL(f)), [photos]);
-  useEffect(() => () => previews.forEach((u) => URL.revokeObjectURL(u)), [previews]);
+  // Photos are stored as data-URL strings (see onPhotos) so they persist
+  // reliably in IndexedDB. Older dishes may still hold Blobs — handle both.
+  const previews = useMemo(
+    () => photos.map((p) => (typeof p === "string" ? p : URL.createObjectURL(p))),
+    [photos]
+  );
+  useEffect(
+    () => () =>
+      previews.forEach((u) => {
+        if (u.startsWith("blob:")) URL.revokeObjectURL(u);
+      }),
+    [previews]
+  );
 
   function toggleOrigin(o) {
     setOrigins((prev) =>
@@ -110,9 +120,24 @@ export default function AddDish({ dishes, dish, onCancel, onSaved }) {
     );
   }
 
+  // Read each chosen image into a data-URL string (reliable to persist in
+  // IndexedDB and to display directly).
   function onPhotos(e) {
-    setPhotos((prev) => [...prev, ...Array.from(e.target.files)]);
+    const files = Array.from(e.target.files);
     e.target.value = ""; // allow re-picking the same file
+    Promise.all(
+      files.map(
+        (file) =>
+          new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(file);
+          })
+      )
+    )
+      .then((dataUrls) => setPhotos((prev) => [...prev, ...dataUrls]))
+      .catch(() => setError("Couldn't read that image — try another file."));
   }
 
   function removePhoto(i) {

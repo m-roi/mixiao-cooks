@@ -187,6 +187,118 @@ section {
   border-color: var(--ink);
 }
 
+/* ---- Menu top bar + search ---- */
+.menu-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.menu-topbar .back {
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+/* Search: a magnifier + underlined field, sized like the "home" link. */
+.search {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-bottom: 1px solid var(--muted);
+  padding-bottom: 3px;
+  color: var(--muted);
+}
+
+.search-icon {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.search-input {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  width: 250px;
+  max-width: 52vw;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--ink);
+}
+
+.search-input::placeholder {
+  color: var(--muted);
+}
+
+.search-input:focus {
+  outline: none;
+}
+
+/* ---- Dish grid ---- */
+/* Inner dashed grid lines only — no outer box. The wrap clips the negative
+   margins so the rightmost/bottommost dashed edges don't show. */
+.dish-grid-wrap {
+  overflow: hidden;
+}
+
+.dish-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  margin: 0 -1px -1px 0;
+}
+
+.dish-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: none;
+  border: 0;
+  border-right: 1px dashed var(--rule);
+  border-bottom: 1px dashed var(--rule);
+  padding: 18px 18px 24px;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+/* Whole image fits (contain), sized to mirror the recipe page's objects. */
+.dish-card-img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+}
+
+.dish-card-img img {
+  max-width: 100%;
+  max-height: 150px;
+  object-fit: contain;
+}
+
+.dish-card-name {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.15rem;
+  line-height: 1.12;
+}
+
+.dish-card:hover .dish-card-name {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.dish-card-meta {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
 /* ---- Dish list ---- */
 
 .dish-list {
@@ -287,21 +399,33 @@ section {
   color: var(--muted);
 }
 
-/* Dish photos: framed objects on cream, horizontally scrollable if several. */
-.photo-strip {
+/* Dish detail header: name + meta on the left, a small photo to the right. */
+.detail-head {
   display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  margin-top: 24px;
-  padding-bottom: 4px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
 }
 
-.photo-frame img {
+.detail-head-text {
+  flex: 1 1 280px;
+}
+
+.detail-photos {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Whole image fits, capped small — no cropping. */
+.detail-photos img {
   display: block;
-  height: 240px;
   width: auto;
+  max-width: min(260px, 36vw);
+  max-height: 124px;
   border-radius: 4px;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.15));
 }
 
 /* ---- Gacha draw ---- */
