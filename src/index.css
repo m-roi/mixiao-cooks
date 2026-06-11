@@ -1,0 +1,863 @@
+/* Step 2 — design language from the cabbages.world reference:
+   warm cream ground, chunky pixel display font, underlined mono labels,
+   neutral sans body, editorial spacing with thin horizontal rules. */
+
+:root {
+  --cream: #f4f0e6; /* warm off-white paper ground */
+  --ink: #1d1b16; /* warm near-black */
+  --muted: #8a8473; /* warm gray for meta text */
+  --rule: #d8d2c2; /* thin section rules */
+  --chip-border: #cbc4b2;
+
+  --font-display: "Pixelify Sans", monospace; /* dish names, headings */
+  --font-mono: "Space Mono", ui-monospace, monospace; /* labels & links */
+  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ---- Type ---- */
+
+h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  margin: 0 0 14px;
+}
+
+/* Section labels ("Ingredients:", "Appliances:", "Instructions:") — the
+   underlined monospace treatment from the reference. */
+h2 {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 1rem;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  margin: 0 0 16px;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--rule);
+  margin: 32px 0;
+}
+
+.loading,
+.empty {
+  font-family: var(--font-mono);
+  color: var(--muted);
+}
+
+/* ---- Layout ---- */
+
+.screen {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 28px 24px 72px;
+}
+
+section {
+  margin-bottom: 4px;
+}
+
+/* Mono underlined back / nav link */
+.back {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 22px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.back:hover {
+  color: var(--ink);
+}
+
+/* ---- Home ---- */
+
+.home {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 32px 24px;
+  gap: 48px;
+}
+
+.home-question {
+  /* One line always: scales with viewport width so it never wraps or clips,
+     while keeping the large size on wide screens. */
+  font-size: clamp(1.5rem, 7vw, 5rem);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.home-options {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.home-option {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.6rem, 5vw, 2.3rem);
+  background: none;
+  border: none;
+  color: var(--ink);
+  cursor: pointer;
+  padding: 4px 2px;
+  transition: transform 0.12s ease;
+}
+
+.home-option:hover {
+  transform: scale(1.12);
+}
+
+/* ---- Filters ---- */
+
+.filters {
+  margin-bottom: 28px;
+}
+
+.filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.filter-label {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-right: 4px;
+}
+
+.chip {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  border: 1px solid var(--chip-border);
+  background: transparent;
+  border-radius: 999px;
+  padding: 4px 14px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: var(--ink);
+}
+
+.chip-on {
+  background: var(--ink);
+  color: var(--cream);
+  border-color: var(--ink);
+}
+
+/* ---- Dish list ---- */
+
+.dish-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dish-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  padding: 20px 2px;
+  cursor: pointer;
+}
+
+.dish-row:hover .dish-name {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.dish-name {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.5rem;
+  line-height: 1.1;
+}
+
+.dish-meta {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* ---- Detail ---- */
+
+/* Ingredients & appliances as framed photo objects on the cream ground,
+   each with a caption underneath — the reference look. Objects with no
+   library image show just the caption (plain text fallback). */
+.object-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 24px 32px;
+}
+
+.object {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 116px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--ink);
+}
+
+.object-tap {
+  cursor: pointer;
+}
+
+.frame {
+  height: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.frame img {
+  max-width: 100%;
+  max-height: 92px;
+  object-fit: contain;
+  /* lifts the cut-out off the cream like the reference */
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.12));
+}
+
+.caption {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--ink);
+}
+
+.object-tap:hover .caption {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.caption.checked {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+/* Dish photos: framed objects on cream, horizontally scrollable if several. */
+.photo-strip {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  margin-top: 24px;
+  padding-bottom: 4px;
+}
+
+.photo-frame img {
+  display: block;
+  height: 240px;
+  width: auto;
+  border-radius: 4px;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.15));
+}
+
+/* ---- Gacha draw ---- */
+
+.draw-screen {
+  text-align: center;
+}
+
+.draw-screen .back {
+  display: block;
+  text-align: left;
+}
+
+.gacha {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 8px auto 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Pixel-art gacha machine. The SVG is drawn on a small grid with crisp,
+   non-antialiased edges so it reads as pixel art when scaled up. */
+.machine {
+  width: 188px;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+/* The crank turns in discrete steps for a retro, pixel feel. */
+.crank {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.gacha-cranking .crank {
+  animation: crank-turn 0.7s steps(8);
+}
+
+@keyframes crank-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* A drop-in sprite is one flat image, so nudge the whole machine on crank. */
+.gacha-cranking .machine-img {
+  animation: machine-nudge 0.6s ease;
+  transform-origin: bottom center;
+}
+
+@keyframes machine-nudge {
+  30% {
+    transform: rotate(-2deg);
+  }
+  70% {
+    transform: rotate(2deg);
+  }
+}
+
+/* Reveal area: the pixel ball drops in, then the paper unfurls below it. */
+.reveal {
+  position: relative;
+  width: 260px;
+  height: 168px;
+  margin-top: 6px;
+}
+
+/* Collapse the reveal before a draw so the hint sits under the machine. */
+.gacha-idle .reveal {
+  height: 0;
+}
+
+.capsule {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  margin-left: -16px;
+  opacity: 0;
+  z-index: 2; /* the ball rests on top of the paper's top edge */
+}
+
+.ball {
+  display: block;
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+}
+
+.gacha-dropping .capsule,
+.gacha-opening .capsule,
+.gacha-revealed .capsule {
+  opacity: 1;
+}
+
+.gacha-dropping .capsule {
+  animation: capsule-drop 0.7s cubic-bezier(0.3, 1.1, 0.5, 1);
+}
+
+@keyframes capsule-drop {
+  0% {
+    transform: translateY(-150px);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(8px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Pixel paper slip — square corners, thick dark border, unfurls in steps. */
+.paper {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  margin-left: -110px;
+  width: 220px;
+  background: #fbf7ef;
+  border: 3px solid #3a2e2e;
+  padding: 18px 16px;
+  transform: scaleY(0);
+  transform-origin: top center;
+  transition: transform 0.45s steps(6);
+  z-index: 1;
+}
+
+.gacha-opening .paper,
+.gacha-revealed .paper {
+  transform: scaleY(1);
+}
+
+.gacha-revealed .paper {
+  cursor: pointer;
+}
+
+.draw-hint {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 8px 0 0;
+}
+
+/* ---- Add-dish form ---- */
+
+.add-dish-link {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 22px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.add-dish-link:hover {
+  color: var(--ink);
+}
+
+.text-input {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  width: 100%;
+  max-width: 460px;
+  background: #fffdf7;
+  border: 1px solid var(--chip-border);
+  border-radius: 3px;
+  padding: 8px 10px;
+  color: var(--ink);
+}
+
+textarea.text-input {
+  resize: vertical;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: var(--ink);
+}
+
+.list-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.list-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.list-num {
+  font-family: var(--font-mono);
+  color: var(--muted);
+  padding-top: 9px;
+  min-width: 22px;
+}
+
+.row-remove {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 6px 4px 0;
+}
+
+.row-remove:hover {
+  color: var(--ink);
+}
+
+.add-more {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.add-more:hover {
+  color: var(--ink);
+}
+
+.inline-add {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.inline-add .text-input {
+  max-width: 220px;
+}
+
+/* photo upload */
+.file-label {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.file-label:hover {
+  color: var(--ink);
+}
+
+.photo-previews {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.photo-preview {
+  position: relative;
+}
+
+.photo-preview img {
+  display: block;
+  height: 90px;
+  width: 90px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--chip-border);
+}
+
+.photo-preview .row-remove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--cream);
+  border: 1px solid var(--chip-border);
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+}
+
+/* timers */
+.timer-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.timer-row .text-input {
+  max-width: 220px;
+}
+
+.num-input {
+  font-family: var(--font-body);
+  width: 56px;
+  background: #fffdf7;
+  border: 1px solid var(--chip-border);
+  border-radius: 3px;
+  padding: 8px;
+}
+
+.num-unit {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.form-error {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: #b0402f;
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.save-btn {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.3rem;
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  border-radius: 4px;
+  padding: 10px 22px;
+  cursor: pointer;
+}
+
+.save-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.paper-photo {
+  display: block;
+  max-width: 100%;
+  max-height: 150px;
+  margin: 0 auto 10px;
+  border-radius: 4px;
+}
+
+.paper-name {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.4rem;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.paper-hint {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin: 10px 0 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.draw-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.draw-action {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.4rem;
+  background: none;
+  border: none;
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.draw-action:hover {
+  transform: scale(1.08);
+}
+
+.draw-redraw {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.draw-redraw:hover {
+  color: var(--ink);
+}
+
+/* Edit / delete controls at the foot of the dish detail. */
+.detail-admin {
+  display: flex;
+  gap: 24px;
+}
+
+.admin-link {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.admin-link:hover {
+  color: var(--ink);
+}
+
+.admin-danger:hover {
+  color: #b0402f;
+}
+
+/* ---- Timers ---- */
+.timer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.timer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  border-radius: 4px;
+}
+
+.timer-label {
+  font-family: var(--font-body);
+  min-width: 110px;
+}
+
+.timer-time {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.5rem;
+  min-width: 76px;
+}
+
+.timer-btn {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.timer-btn:hover {
+  color: var(--muted);
+}
+
+.timer-reset {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Finished: red time + a flashing background to grab attention. */
+.timer-done .timer-time {
+  color: #b0402f;
+}
+
+.timer-done {
+  animation: timer-flash 0.5s steps(1) 6;
+}
+
+@keyframes timer-flash {
+  50% {
+    background: #f3d9a0;
+  }
+}
+
+/* "Claude it!" heading — bold, no underline (unlike the other mono labels). */
+.claude-heading {
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Ask-Claude controls — underlined mono links, like the reference's link. */
+.claude-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: center;
+}
+
+.claude-link {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--ink);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.claude-link:hover {
+  color: var(--muted);
+}
+
+.steps {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.steps li {
+  margin-bottom: 14px;
+  padding-left: 6px;
+}
+
+.steps li::marker {
+  font-family: var(--font-mono);
+  color: var(--muted);
+}
